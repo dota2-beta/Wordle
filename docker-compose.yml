@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  wordle_db:
+    image: postgres:16.0
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=wordle_db
+    ports:
+      - '5434:5432'
+    volumes:
+      - pg_wordle:/var/lib/postgresql/data
+    networks:
+      - wordle-network
+networks:
+  wordle-network:
+    driver: bridge
+volumes:
+  pg_wordle:

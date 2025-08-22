@@ -73,31 +73,24 @@ public class GameServiceImpl implements GameService {
 
     @Transactional
     public GuessResponseDTO processGuess(long gameId, String guess, Authentication authentication) {
-        // Проверка доступа
         checkAccess(gameId, authentication);
 
-        // Получение игры
         Game game = getGameById(gameId);
-        User user = game.getUser(); // Получаем пользователя для обновления статистики
+        User user = game.getUser();
 
-        // Проверка состояния игры и валидности ввода
         if (game.getGameStatus() != GameStatus.PROCEED) {
             throw new GameAlreadyFinishedException("Game is already finished");
         }
-        if (guess.length() != WORD_LENGTH) { // Сравниваем с длиной слова в игре
+        if (guess.length() != WORD_LENGTH) {
             throw new GuessLengthException("The word must contain " + WORD_LENGTH + " letters");
         }
         if (!checkGuessExist(guess)) {
             throw new InvalidGuessException("There's no such word in our dictionary");
         }
-
-        // Инкремент попытки перед проверкой исхода
         game.setCurrentTry(game.getCurrentTry() + 1);
 
-        // Сохранение попытки и определение статусов букв
         List<LetterStatus> letterStatuses = saveAttemptAndLetterStatuses(game, guess);
 
-        // Определение исхода игры и обновление статистики
         boolean gameWon = game.getWord().equals(guess);
         boolean gameLost = !gameWon && game.getCurrentTry() >= MAX_CURRENT_TRY;
 
@@ -116,9 +109,6 @@ public class GameServiceImpl implements GameService {
                 userRepository.save(user);
             }
         }
-        // Если ни то, ни другое, статус остается PROCEED
-
-        // Сохранение обновленного состояния игры
         gameRepository.save(game);
         return new GuessResponseDTO(game, guess, letterStatuses);
     }

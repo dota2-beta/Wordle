@@ -18,6 +18,7 @@ public class GuessResponseDTO {
     private List<LetterStatus> letterStatuses;
     private GameStatus gameStatus;
     private int currentTry;
+    private String word;
 
     public GuessResponseDTO(Game game, String guess, List<LetterStatus> letterStatuses) {
         this.gameId = game.getId();
@@ -25,5 +26,11 @@ public class GuessResponseDTO {
         this.letterStatuses = letterStatuses;
         this.gameStatus = game.getGameStatus();
         this.currentTry = game.getCurrentTry();
+
+        if (game.getGameStatus() == GameStatus.WIN || game.getGameStatus() == GameStatus.LOSE) {
+            this.word = game.getWord();
+        } else {
+            this.word = null;
+        }
     }
 }

@@ -1,0 +1,39 @@
+.game-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+
+    width: 100%;
+    max-width: 700px; 
+    margin: 0 auto;  
+}
+
+.error-message {
+    color: #ff5555;
+    background-color: rgba(255, 85, 85, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.game-status {
+    font-size: 1.5rem;
+    margin: 20px 0;
+}
+.game-status.win { color: var(--color-correct); }
+.game-status.lose { color: #ff5555; }
+
+.new-game-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: var(--color-correct);
+    color: white;
+    margin-top: 10px;
+}

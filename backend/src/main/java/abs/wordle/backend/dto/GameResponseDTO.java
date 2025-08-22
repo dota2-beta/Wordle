@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GameResponseDTO {
     private Long id;
-    private String word; // Загаданное слово (только если игра окончена)
+    private String word;
     private List<Attempt> attempts;
     private int currentTry;
     private GameStatus gameStatus;
@@ -22,7 +22,6 @@ public class GameResponseDTO {
 
     public GameResponseDTO(Game game) {
         this.id = game.getId();
-        // Устанавливаем word, только если игра окончена
         if (game.getGameStatus() == GameStatus.WIN || game.getGameStatus() == GameStatus.LOSE) {
             this.word = game.getWord();
         } else {
