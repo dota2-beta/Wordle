@@ -3,10 +3,13 @@ package abs.wordle.backend.controllers;
 import abs.wordle.backend.dto.UserResponseDTO;
 import abs.wordle.backend.models.User;
 import abs.wordle.backend.services.UserServiceImpl;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,5 +42,15 @@ public class UserController {
     @GetMapping("/top")
     public Map<String, Integer> getTop20Users() {
         return userService.getTop20Users();
+    }
+
+    @GetMapping("/me/rank")
+    public ResponseEntity<Map<String, Long>> getMyRank(Authentication authentication) {
+        String currentUsername = authentication.getName();
+        Long rank = userService.getUserRank(currentUsername);
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("rank", rank);
+        return ResponseEntity.ok(response);
     }
 }

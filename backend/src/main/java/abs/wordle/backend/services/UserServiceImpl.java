@@ -53,4 +53,12 @@ public class UserServiceImpl implements UserService {
                                 LinkedHashMap::new
                         ));
     }
+
+    @Override
+    public Long getUserRank(String username) {
+        return userRepository.findUserRankByUsername(username).orElseThrow(
+                () -> new RuntimeException("User not found")
+        );
+    }
+
 }

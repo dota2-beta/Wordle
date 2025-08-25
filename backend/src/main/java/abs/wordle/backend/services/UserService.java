@@ -14,4 +14,6 @@ public interface UserService {
     List<User> getAll();
     User getAuthenticated(UserDetails userDetails);
     LinkedHashMap<String, Integer> getTop20Users();
+
+    Long getUserRank(String username);
 }
