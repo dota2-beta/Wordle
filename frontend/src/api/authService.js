@@ -11,3 +11,7 @@ export const login = (credentials) => {
 export const getProfile = () => {
     return apiClient.get('/users/profile');
 }
+
+export const getMyRank = () => {
+    return apiClient.get('/users/me/rank');
+};
