@@ -117,7 +117,7 @@ public class GameServiceImpl implements GameService {
         return userRepository.countByWinsGreaterThan(user.getWins());
     }
 
-    private List<LetterStatus> determineLetterStatuses(String word, String guess) {
+    public List<LetterStatus> determineLetterStatuses(String word, String guess) {
         List<LetterStatus> letterStatuses = new ArrayList<>();
         HashMap<Character, Integer> letterCounts = new HashMap<>();
 
