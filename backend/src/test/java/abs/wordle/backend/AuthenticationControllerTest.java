@@ -81,7 +81,5 @@ public class AuthenticationControllerTest {
                     .content(objectMapper.writeValueAsString(authenticationRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").exists());
-
-
     }
 }

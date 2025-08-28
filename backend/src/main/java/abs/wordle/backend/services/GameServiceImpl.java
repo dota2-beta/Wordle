@@ -12,6 +12,7 @@ import abs.wordle.backend.repository.AttemptRepository;
 import abs.wordle.backend.repository.GameRepository;
 import abs.wordle.backend.repository.LetterStatusesRepository;
 import abs.wordle.backend.repository.UserRepository;
+import abs.wordle.backend.utils.WordleUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -117,43 +118,8 @@ public class GameServiceImpl implements GameService {
         return userRepository.countByWinsGreaterThan(user.getWins());
     }
 
-    public List<LetterStatus> determineLetterStatuses(String word, String guess) {
-        List<LetterStatus> letterStatuses = new ArrayList<>();
-        HashMap<Character, Integer> letterCounts = new HashMap<>();
-
-        for(char c : word.toCharArray()) {
-            letterCounts.put(c, letterCounts.getOrDefault(c, 0) + 1);
-        }
-
-        for(int i = 0; i < word.length(); i++) {
-            if(word.charAt(i) == guess.charAt(i)) {
-                letterStatuses.add(LetterStatus.CORRECT);
-                letterCounts.put(word.charAt(i), letterCounts.get(word.charAt(i)) - 1);
-            }
-            else
-                letterStatuses.add(null);
-        }
-
-        for(int i = 0; i < word.length(); i++) {
-            if (letterStatuses.get(i) == null) {
-                int guessChar = word.indexOf(guess.charAt(i));
-                if(guessChar == -1)
-                    letterStatuses.set(i, LetterStatus.INCORRECT);
-                else if (letterCounts.get(guess.charAt(i)) > 0) {
-                    letterStatuses.set(i, LetterStatus.MISPLACED);
-                    letterCounts.put(guess.charAt(i), letterCounts.get(guess.charAt(i)) - 1);
-                }
-                else
-                    letterStatuses.set(i, LetterStatus.INCORRECT);
-            }
-        }
-
-        System.out.println(letterStatuses);
-        return letterStatuses;
-    }
-
     private List<LetterStatus> saveAttemptAndLetterStatuses(Game game, String guess) {
-        List<LetterStatus> letterStatuses = determineLetterStatuses(game.getWord(), guess);
+        List<LetterStatus> letterStatuses = WordleUtils.determineLetterStatuses(game.getWord(), guess);
 
         Attempt attempt = new Attempt();
         attempt.setGame(game);
@@ -183,6 +149,7 @@ public class GameServiceImpl implements GameService {
         Game game = getGameById(gameId);
         User gameOwner = game.getUser();
         String currentUsername = null;
+
 
         if (  authentication != null
            && authentication.isAuthenticated()
