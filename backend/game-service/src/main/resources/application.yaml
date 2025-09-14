@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: game-service
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        default_schema: game_schema
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-game.sql
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    url: jdbc:postgresql://localhost:5434/wordle_db
+    username: postgres
+    password: postgres
+  kafka:
+    bootstrap-servers: localhost:29092
+server:
+  port: 8081
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://wordle_db:5432/wordle_db
+    username: postgres
+    password: postgres
+  kafka:
+    bootstrap-servers: kafka:9092

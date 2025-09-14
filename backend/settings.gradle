@@ -1,1 +1,6 @@
 rootProject.name = 'backend'
+
+include 'game-service'
+include 'user-service'
+include 'api-gateway'
+include 'wordle-common-models'
