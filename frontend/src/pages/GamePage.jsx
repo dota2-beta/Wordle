@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Board from '../components/Board';
 import Keyboard from '../components/Keyboard';
 import { createGame, makeGuess } from '../api/gameService';
+import { getTopPlayers } from '../api/authService'; 
+import TopPlayersSidebar from '../components/TopPlayersSidebar';
 import './GamePage.css';
 
 const WORD_LENGTH = 5;
@@ -12,7 +14,24 @@ const GamePage = () => {
     const [currentGuess, setCurrentGuess] = useState('');
     const [error, setError] = useState('');
     const [usedLetters, setUsedLetters] = useState({});
+    const [topPlayers, setTopPlayers] = useState([]);
+    const [topPlayersLoading, setTopPlayersLoading] = useState(true);
+    const [topPlayersError, setTopPlayersError] = useState(null);
 
+    const fetchTopPlayers = () => {
+        setTopPlayersLoading(true);
+        getTopPlayers()
+            .then(response => {
+                const playersData = Object.entries(response.data).map(([username, wins]) => ({
+                    username,
+                    wins,
+                }));
+                setTopPlayers(playersData);
+            })
+            .catch(err => setTopPlayersError("Ошибка загрузки рейтинга."))
+            .finally(() => setTopPlayersLoading(false));
+    };
+    
     const startNewGame = useCallback(() => {
         createGame()
             .then(response => {
@@ -22,6 +41,8 @@ const GamePage = () => {
                 setUsedLetters({});
             })
             .catch(err => setError("Не удалось начать новую игру."));
+        
+        fetchTopPlayers();
     }, []);
 
     useEffect(() => {
@@ -56,8 +77,6 @@ const GamePage = () => {
                     attempts: newAttempts,
                     currentTry: guessResult.currentTry,
                     gameStatus: guessResult.gameStatus,
-                    // ИЗМЕНЕНИЕ ЗДЕСЬ: Берем слово напрямую из ответа API,
-                    // а не из предыдущего состояния, где его не было.
                     word: guessResult.word 
                 }));
 
@@ -72,6 +91,9 @@ const GamePage = () => {
 
                 setCurrentGuess('');
                 setError('');
+                if (guessResult.gameStatus === 'WIN' || guessResult.gameStatus === 'LOSE') {
+                    setTimeout(fetchTopPlayers, 1500);
+                }
             })
             .catch(err => setError(err.response?.data?.message || "Произошла ошибка"));
     };
@@ -94,26 +116,34 @@ const GamePage = () => {
     if (!game) return <div>Загрузка...</div>;
 
     return (
-        <div className="game-page">
-            <h1>Wordle</h1>
-            {error && <div className="error-message">{error}</div>}
-            <Board
-                attempts={game.attempts}
-                currentTry={game.currentTry}
-                currentGuess={currentGuess}
-            />
-            {game.gameStatus === 'WIN' && <div className="game-status win">Вы победили!</div>}
-            {game.gameStatus === 'LOSE' && <div className="game-status lose">Вы проиграли! Загаданное слово: {game.word}</div>}
+        <div className="game-page-layout">
+            <div className="game-container">
+                <h1>Wordle</h1>
+                {error && <div className="error-message">{error}</div>}
+                <Board
+                    attempts={game.attempts}
+                    currentTry={game.currentTry}
+                    currentGuess={currentGuess}
+                />
+                {game.gameStatus === 'WIN' && <div className="game-status win">Вы победили!</div>}
+                {game.gameStatus === 'LOSE' && <div className="game-status lose">Вы проиграли! Загаданное слово: {game.word}</div>}
 
-            {(game.gameStatus === 'WIN' || game.gameStatus === 'LOSE') && (
-                <button onClick={startNewGame} className="new-game-btn">Новая игра</button>
-            )}
+                {(game.gameStatus === 'WIN' || game.gameStatus === 'LOSE') && (
+                    <button onClick={startNewGame} className="new-game-btn">Новая игра</button>
+                )}
 
-            <Keyboard
-                onKeyPress={handleKeyPress}
-                onEnter={handleEnter}
-                onDelete={handleDelete}
-                usedLetters={usedLetters}
+                <Keyboard
+                    onKeyPress={handleKeyPress}
+                    onEnter={handleEnter}
+                    onDelete={handleDelete}
+                    usedLetters={usedLetters}
+                />
+            </div>
+            
+            <TopPlayersSidebar 
+                players={topPlayers}
+                loading={topPlayersLoading}
+                error={topPlayersError}
             />
         </div>
     );

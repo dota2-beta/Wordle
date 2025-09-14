@@ -1,9 +1,9 @@
 import apiClient from './axiosConfig';
 
 export const createGame = () => {
-    return apiClient.get('/games/create');
+    return apiClient.post('/api/games/create');
 };
 
 export const makeGuess = (gameId, guess) => {
-    return apiClient.post('/games/guess', { gameId, guess });
+    return apiClient.post('/api/games/guess', { gameId, guess });
 };

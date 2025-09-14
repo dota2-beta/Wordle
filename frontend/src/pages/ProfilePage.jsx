@@ -5,53 +5,53 @@ import { getMyRank } from '../api/authService';
 import './ProfilePage.css';
 
 const ProfilePage = () => {
-    const { user, logout, loading } = useAuth();
+    const { user, logout, loading, refreshUser, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [rank, setRank] = useState(null);
+
     useEffect(() => {
-        if (user) {
+        if (isAuthenticated) {
+            refreshUser();
             getMyRank()
-                .then(response => {
-                    setRank(response.data.rank);
-                })
+                .then(response => setRank(response.data.rank))
                 .catch(error => {
-                    console.error("Не удалось загрузить ранг пользователя:", error);
+                    console.error("Не удалось загрузить ранг:", error);
                     setRank('Ошибка');
                 });
         }
-    }, [user]);
+    }, [isAuthenticated]);
 
-    if (loading) {
-        return <div>Загрузка профиля...</div>;
-    }
-
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
+    useEffect(() => {
+        if (!loading && !isAuthenticated) {
+            navigate('/login');
+        }
+    }, [loading, isAuthenticated, navigate]);
 
     const handleLogout = () => {
         logout();
         navigate('/');
     };
 
-    return (
-        <div className="profile-container">
-            <h2>Профиль пользователя</h2>
-            <p><strong>Имя пользователя:</strong> {user.username}</p>
-            <p><strong>Имя:</strong> {user.firstName}</p>
-            <p><strong>Фамилия:</strong> {user.lastName}</p>
-            <p><strong>Победы:</strong> {user.wins}</p>
-            <p><strong>Поражения:</strong> {user.losses}</p>
-            {rank !== null ? (
-                <p><strong>Позиция в рейтинге:</strong> {rank}</p>
-            ) : (
-                <p><strong>Позиция в рейтинге:</strong> Загрузка...</p>
-            )}
+    if (loading) {
+        return <div>Загрузка...</div>;
+    }
+    
+    if (isAuthenticated && user) {
+        return (
+            <div className="profile-container">
+                <h2>Профиль пользователя</h2>
+                <p><strong>Имя пользователя:</strong> {user.username}</p>
+                <p><strong>Имя:</strong> {user.firstName}</p>
+                <p><strong>Фамилия:</strong> {user.lastName}</p>
+                <p><strong>Победы:</strong> {user.wins}</p>
+                <p><strong>Поражения:</strong> {user.losses}</p>
+                <p><strong>Позиция в рейтинге:</strong> {rank === null ? 'Загрузка...' : rank}</p>
+                <button onClick={handleLogout} className="logout-btn">Выйти</button>
+            </div>
+        );
+    }
 
-            <button onClick={handleLogout} className="logout-btn">Выйти</button>
-        </div>
-    );
+    return null;
 };
 
 export default ProfilePage;

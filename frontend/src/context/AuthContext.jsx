@@ -7,27 +7,33 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const loadUserFromToken = async () => {
+    useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            try {
-                const response = await getProfile();
-                setUser(response.data);
-            } catch (error) {
-                localStorage.removeItem('token');
-                setUser(null);
-            }
+            getProfile()
+                .then(response => setUser(response.data))
+                .catch(() => {
+                    localStorage.removeItem('token');
+                    setUser(null);
+                })
+                .finally(() => setLoading(false));
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        loadUserFromToken();
     }, []);
 
     const login = async (token) => {
         localStorage.setItem('token', token);
-        await loadUserFromToken(); 
+        setLoading(true);
+        try {
+            const response = await getProfile();
+            setUser(response.data);
+        } catch (error) {
+            localStorage.removeItem('token');
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const logout = () => {
@@ -35,8 +41,17 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     };
 
+    const refreshUser = async () => {
+        try {
+            const response = await getProfile();
+            setUser(response.data);
+        } catch (error) {
+            logout();
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading }}>
+        <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user, loading, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );
