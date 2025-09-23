@@ -32,11 +32,9 @@ dependencies {
     implementation 'app.cash.sqldelight:postgresql-dialect:2.0.0'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation("org.mockito:mockito-core:5.19.0")
     runtimeOnly 'org.postgresql:postgresql'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation project(':wordle-common-models')
-
     annotationProcessor "org.projectlombok:lombok"
 }
 test {

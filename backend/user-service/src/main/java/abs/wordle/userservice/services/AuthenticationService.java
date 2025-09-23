@@ -4,6 +4,7 @@ import abs.wordle.userservice.dto.AuthenticationRequestDTO;
 import abs.wordle.userservice.dto.AuthenticationResponseDTO;
 import abs.wordle.userservice.dto.UserRequestDTO;
 import abs.wordle.userservice.enums.UserRole;
+import abs.wordle.userservice.exceptions.UserAlreadyExistException;
 import abs.wordle.userservice.repository.UserRepository;
 import abs.wordle.userservice.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class AuthenticationService {
 
     public AuthenticationResponseDTO register(UserRequestDTO request) {
         if(userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new UsernameNotFoundException("Username already exists");
+            throw new UserAlreadyExistException("Username already exists");
         }
         var user = User.builder()
                 .firstName(request.getFirstName())
