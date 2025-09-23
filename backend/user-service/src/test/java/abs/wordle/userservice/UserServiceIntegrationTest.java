@@ -1,16 +1,12 @@
 package abs.wordle.userservice;
 
 import abs.wordle.userservice.dto.AuthenticationRequestDTO;
-import abs.wordle.userservice.dto.AuthenticationResponseDTO;
-import abs.wordle.userservice.dto.UserInternalDto;
 import abs.wordle.userservice.dto.UserRequestDTO;
 import abs.wordle.userservice.enums.UserRole;
 import abs.wordle.userservice.models.User;
 import abs.wordle.userservice.repository.UserRepository;
 import abs.wordle.userservice.security.JwtService;
 import abs.wordle.userservice.services.AuthenticationService;
-import abs.wordle.userservice.services.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -21,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;

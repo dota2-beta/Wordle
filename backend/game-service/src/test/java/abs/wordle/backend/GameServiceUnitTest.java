@@ -4,6 +4,8 @@ import abs.wordle.backend.clients.UserClient;
 import abs.wordle.backend.dto.UserDto;
 import abs.wordle.backend.enums.GameStatus;
 import abs.wordle.backend.exceptions.AccessDeniedException;
+import abs.wordle.backend.exceptions.GameNotFoundException;
+import abs.wordle.backend.exceptions.GuessLengthException;
 import abs.wordle.backend.exceptions.InvalidGuessException;
 import abs.wordle.backend.models.Game;
 import abs.wordle.backend.producers.GameEventProducer;
@@ -90,7 +92,7 @@ public class GameServiceUnitTest {
         //arrange
         String word = "tasty";
         Long gameId = 12L;
-        Game testGame = new Game(word);
+        Game testGame = new Game("GRAVE");
         testGame.setId(gameId);
         testGame.setCurrentTry(5);
         testGame.setGameStatus(GameStatus.PROCEED);
@@ -115,6 +117,22 @@ public class GameServiceUnitTest {
         when(gameRepository.findById(gameId)).thenReturn(Optional.of(testGame));
         //act && assert
         assertThrows(AccessDeniedException.class, () -> gameService.processGuess(gameId, word, 1L));
+    }
+
+    @Test
+    void processGuess_shouldThrowGuessLengthException_whenGuessHasTooManyLetters() {
+        //arrange
+        String word = "tastyyyy";
+        Long gameId = 12L;
+        Game testGame = new Game("GRAVE");
+        testGame.setId(gameId);
+        testGame.setCurrentTry(5);
+        testGame.setGameStatus(GameStatus.PROCEED);
+        testGame.setUserId(99L);
+
+        when(gameRepository.findById(gameId)).thenReturn(Optional.of(testGame));
+        //act && assert
+        assertThrows(GuessLengthException.class, () -> gameService.processGuess(gameId, word, 99L));
     }
 }
 
