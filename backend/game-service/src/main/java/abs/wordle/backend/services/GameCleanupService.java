@@ -25,11 +25,11 @@ public class GameCleanupService {
         log.info("Deleted {} Games", deletedCount);
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void cleanupAbandonedGames() {
         log.info("Cleaning up abandoned games");
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(1);
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(60);
         int deletedCount = gameRepository.deleteAbandonedGamesOlderThan(cutoff, GameStatus.PROCEED);
         log.info("Deleted {} Abandoned Games", deletedCount);
     }
