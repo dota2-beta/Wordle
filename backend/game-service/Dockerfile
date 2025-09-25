@@ -1,25 +1,12 @@
-# --- Стадия 1: Сборка приложения ---
-    FROM gradle:8.5-jdk17-alpine AS builder
+FROM gradle:8.5-jdk17-alpine AS builder
+WORKDIR /app
+COPY . .
+RUN apk add --no-cache dos2unix
+RUN dos2unix ./gradlew
+RUN ./gradlew :game-service:bootJar --no-daemon
 
-    # Устанавливаем рабочую директорию
-    WORKDIR /app
-    
-    # Копируем весь проект из контекста (из папки backend)
-    COPY . .
-    
-    # Собираем JAR-файл ТОЛЬКО для game-service (и его зависимостей)
-    RUN ./gradlew :game-service:bootJar --no-daemon
-    
-    # --- Стадия 2: Создание финального, легковесного образа ---
-    FROM openjdk:17-alpine
-    
-    WORKDIR /app
-    
-    # Копируем только собранный JAR-файл из стадии сборки
-    COPY --from=builder /app/game-service/build/libs/*.jar app.jar
-    
-    # Указываем порт, который использует сервис (согласно docker-compose.yml)
-    EXPOSE 8081
-    
-    # Запускаем приложение
-    ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM openjdk:17-alpine
+WORKDIR /app
+COPY --from=builder /app/game-service/build/libs/*.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "app.jar"]
